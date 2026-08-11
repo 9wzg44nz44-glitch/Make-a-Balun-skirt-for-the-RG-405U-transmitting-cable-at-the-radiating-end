@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hively-Style RG-405/U Skirt Balun & Stub Transmitter Calculator</title>
+    <style>
+        :root {
+            --bg: #0f1419;
+            --card: #1a2332;
+            --accent: #3b82f6;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        h1 { font-size: 1.55rem; margin-bottom: 0.5rem; color: #60a5fa; }
+        h2 { font-size: 1.25rem; margin: 1.5rem 0 0.75rem; color: #93c5fd; border-bottom: 1px solid #334155; padding-bottom: 0.3rem; }
+        h3 { font-size: 1.05rem; margin: 1rem 0 0.5rem; color: #a5b4fc; }
+        p, li { color: var(--muted); margin-bottom: 0.55rem; }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid #334155;
+        }
+        label { display: block; font-weight: 600; margin-bottom: 0.35rem; color: var(--text); }
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
+        .value-display {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--success);
+            margin: 0.25rem 0 0.7rem;
+        }
+        .formula { background: #0f172a; padding: 0.75rem; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 0.9rem; overflow-x: auto; margin: 0.5rem 0; }
+        .warning { color: var(--warning); font-weight: 600; }
+        .note { font-size: 0.9rem; border-left: 3px solid var(--accent); padding-left: 0.75rem; margin: 0.75rem 0; }
+        ul, ol { padding-left: 1.35rem; }
+        table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.95rem; }
+        th, td { padding: 0.45rem 0.6rem; text-align: left; border-bottom: 1px solid #334155; }
+        th { color: #93c5fd; }
+        .highlight { background: #1e3a5f; }
+        footer { margin-top: 2rem; font-size: 0.85rem; color: #64748b; text-align: center; }
+        .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 700px) { .dims { grid-template-columns: 1fr; } }
+        code { background: #0f172a; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Hively-Style RG-405/U Skirt Balun + Stub Transmitter</h1>
+    <p>Interactive design aid for a coaxial skirt (sleeve / bazooka) balun on RG-405/U semi-rigid coax feeding an exposed center-conductor stub. The balun suppresses common-mode TEM currents on the outer shield so that radiation is dominated by the longitudinal (irrotational) current on the stub — the configuration associated with scalar-longitudinal / vector-potential wave launch in Hively-style experiments.</p>
+
+    <div class="card">
+        <h2>1. Operating Frequency</h2>
+        <label for="freq">Transmit frequency (GHz)</label>
+        <input type="range" id="freq" min="0.5" max="12" step="0.05" value="2.45">
+        <div class="value-display" id="freqVal">2.45 GHz</div>
+        <div class="formula">λ = c / f &nbsp;&nbsp;|&nbsp;&nbsp; c = 299 792 458 m/s</div>
+        <p>Free-space wavelength λ = <span id="lambda" class="value-display" style="display:inline;font-size:1rem">122.4 mm</span></p>
+        <p class="note">Preset points of interest: 1.3 GHz, 2.45 GHz, 8 GHz. Move the slider to these values (or any other) and all dimensions update instantly.</p>
+    </div>
+
+    <div class="card">
+        <h2>2. Exposed Center-Conductor Stub</h2>
+        <p>RG-405/U fixed data:</p>
+        <ul>
+            <li>Center conductor diameter: <strong>0.020 in (0.51 mm)</strong> silver-plated copper-clad steel</li>
+            <li>Dielectric (PTFE) OD ≈ 0.066 in</li>
+            <li>Outer conductor (solid copper) OD ≈ <strong>0.086 in (2.18 mm)</strong></li>
+        </ul>
+        <label for="stubFrac">Exposed stub length as fraction of λ</label>
+        <input type="range" id="stubFrac" min="0.05" max="0.50" step="0.01" value="0.25">
+        <div class="value-display" id="stubFracVal">λ/4 (0.25 λ)</div>
+        <p>Recommended exposed center-conductor length: <span id="stubLen" class="value-display" style="display:inline;font-size:1rem">30.6 mm</span></p>
+        <div class="note">Hively-style longitudinal probes often use a short stub (λ/10–λ/4). The spherical wavefront originates near the tip of the exposed center conductor. Strip the outer conductor and dielectric cleanly so only the solid center conductor remains for the chosen length.</div>
+    </div>
+
+    <div class="card">
+        <h2>3. Skirt (Sleeve / Bazooka) Balun Dimensions</h2>
+        <p>A conductive sleeve is placed concentrically over the outer conductor of the RG-405/U, shorted to the outer conductor at the antenna end (near the stub), and left open at the opposite end. At λ/4 electrical length the open end reflects a high impedance that chokes common-mode current on the outside of the shield.</p>
+
+        <label for="vf">Velocity factor of the dielectric between sleeve and coax outer (air ≈ 0.95–1.00; thin PTFE/tape lower)</label>
+        <input type="range" id="vf" min="0.70" max="1.00" step="0.01" value="0.95">
+        <div class="value-display" id="vfVal">VF = 0.95</div>
+
+        <div class="dims">
+            <div>
+                <p><strong>Electrical λ/4</strong></p>
+                <p class="value-display" id="elecQtr">—</p>
+            </div>
+            <div>
+                <p><strong>Physical skirt length</strong> (λ/4 × VF)</p>
+                <p class="value-display" id="skirtLen">—</p>
+            </div>
+        </div>
+
+        <div class="formula">
+            Physical length L ≈ (λ / 4) × VF<br>
+            High common-mode impedance appears at the open end when the electrical length is odd multiples of λ/4.
+        </div>
+
+        <p class="warning">Does the skirt length need to change with frequency? <strong>Yes.</strong> The balun is a resonant quarter-wave structure. For best choking impedance the physical length must be scaled with 1/f. At 1.3 GHz the skirt is roughly 6× longer than at 8 GHz.</p>
+        <div class="note">Larger sleeve diameter relative to the 0.086" coax improves choking impedance (higher Zo of the sleeve-to-shield transmission line). Typical practical sleeves: thin-wall copper or brass tubing, or copper foil formed into a tube and soldered.</div>
+    </div>
+
+    <div class="card">
+        <h2>4. How the Balun is Electrically Connected</h2>
+        <ol>
+            <li><strong>Antenna / stub end (near field):</strong>
+                <ul>
+                    <li>Strip outer conductor and dielectric for the chosen stub length, leaving the solid center conductor exposed.</li>
+                    <li>Slide the conductive skirt over the remaining outer conductor so that one end of the skirt is at (or very near) the dielectric cut-back plane.</li>
+                    <li><strong>Solder or otherwise bond the skirt electrically to the outer conductor of the RG-405/U at that plane</strong> (the “shorted” end of the quarter-wave line). This is the only intentional RF connection of the balun to the coax.</li>
+                    <li>The opposite end of the skirt is left open (no connection to the outer conductor).</li>
+                </ul>
+            </li>
+            <li><strong>Source / SMA end:</strong>
+                <ul>
+                    <li>The far end of the RG-405/U cable is terminated in a standard SMA (or other) connector in the normal way: center pin to center conductor, outer body to the outer conductor of the coax.</li>
+                    <li>There is <em>no</em> special balun connection at the SMA. The skirt balun is a local common-mode choke at the antenna end only.</li>
+                    <li>The entire cable between the balun and the SMA remains ordinary coaxial transmission line for the differential (TEM) mode inside the coax.</li>
+                </ul>
+            </li>
+        </ol>
+        <p class="note">In Hively’s framing the balun minimizes transverse (rotational / TEM) radiation from currents on the outer surface of the shield while allowing the irrotational (longitudinal / gradient-driven) current on the exposed center conductor to launch the desired scalar-longitudinal / vector-potential wave component.</p>
+    </div>
+
+    <div class="card">
+        <h2>5. Step-by-Step Construction & Installation</h2>
+        <ol>
+            <li><strong>Prepare the cable</strong> — Cut RG-405/U to the desired overall length (including the final stub). Install the SMA (or other) connector on the source end using standard semi-rigid techniques (solder outer, capture center pin).</li>
+            <li><strong>Strip the antenna end</strong> — Carefully remove the outer copper conductor and PTFE dielectric for the calculated stub length. Leave a clean, straight center-conductor stub. Deburr any sharp edges.</li>
+            <li><strong>Make the skirt</strong> —
+                <ul>
+                    <li>Cut a length of thin-wall copper or brass tubing (or form copper foil/sheet into a tube) slightly longer than the calculated physical skirt length. Inside diameter should clear the 0.086" outer conductor with a small air gap or thin dielectric spacer.</li>
+                    <li>Alternatively, remove the braid from a short piece of flexible coax and use the braid as a sleeve (classic amateur method).</li>
+                </ul>
+            </li>
+            <li><strong>Install the skirt</strong> — Slide the sleeve onto the RG-405/U from the stub end until the near end of the sleeve sits at the dielectric cut-back plane (or a few mm behind it). Solder the near end of the sleeve all around to the outer conductor of the RG-405/U. Keep the open end free of solder bridges.</li>
+            <li><strong>Optional dielectric</strong> — If you want a lower velocity factor (shorter physical length), insert a thin PTFE sleeve or wrap with low-loss tape between the coax outer and the skirt before soldering.</li>
+            <li><strong>Protect & finish</strong> — Cover the solder joint and open end with heat-shrink or epoxy if mechanical robustness is needed. Keep the open end of the skirt clear so it remains an RF open circuit.</li>
+            <li><strong>Verify</strong> — At the design frequency a good skirt balun presents a high impedance to common-mode current. Network-analyzer S11 or a simple field-probe measurement of outer-conductor current can confirm choking action.</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <h2>6. Quick Reference Dimensions (live)</h2>
+        <table>
+            <tr><th>Parameter</th><th>Value</th></tr>
+            <tr><td>Frequency</td><td id="tFreq">—</td></tr>
+            <tr><td>Free-space λ</td><td id="tLambda">—</td></tr>
+            <tr><td>Exposed stub length</td><td id="tStub">—</td></tr>
+            <tr class="highlight"><td>Skirt physical length (λ/4 × VF)</td><td id="tSkirt">—</td></tr>
+            <tr><td>RG-405/U outer diameter</td><td>0.086 in (2.18 mm)</td></tr>
+            <tr><td>Center-conductor diameter</td><td>0.020 in (0.51 mm)</td></tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Why the length scales with frequency</h2>
+        <p>The skirt and the outer surface of the coax form a shorted coaxial transmission-line stub. The input impedance of a lossless shorted stub is</p>
+        <div class="formula">Z<sub>in</sub> = j Z<sub>0</sub> tan(βL)</div>
+        <p>where β = 2π/λ<sub>g</sub>. This impedance becomes infinite (in the ideal case) when βL = π/2, i.e., L = λ<sub>g</sub>/4. Only at that electrical length does the balun present a high series impedance to common-mode current trying to flow on the outside of the shield. At other frequencies the impedance falls and choking action degrades. Therefore the physical length must track 1/f (and the velocity factor of whatever dielectric fills the sleeve-to-shield gap).</p>
+    </div>
+
+    <footer>
+        Design aid only — based on classic quarter-wave sleeve/bazooka balun practice and the longitudinal-probe + balun approach described in Hively-related SLW literature.<br>
+        Verify dimensions and RF performance experimentally. Not a substitute for the original patents or laboratory practice.
+    </footer>
+
+    <script>
+        const c = 299792458; // m/s
+
+        function update() {
+            const fGHz = parseFloat(document.getElementById('freq').value);
+            const lambdaM = c / (fGHz * 1e9);
+            const lambdaMm = lambdaM * 1000;
+
+            document.getElementById('freqVal').textContent = fGHz.toFixed(2) + ' GHz';
+            document.getElementById('lambda').textContent = lambdaMm.toFixed(1) + ' mm (' + (lambdaM * 100).toFixed(1) + ' cm)';
+
+            // Stub
+            const stubFrac = parseFloat(document.getElementById('stubFrac').value);
+            document.getElementById('stubFracVal').textContent = (Math.abs(stubFrac - 0.25) < 0.005 ? 'λ/4 (0.25 λ)' : stubFrac.toFixed(2) + ' λ');
+            const stubLenMm = lambdaMm * stubFrac;
+            document.getElementById('stubLen').textContent = stubLenMm.toFixed(1) + ' mm';
+
+            // Skirt
+            const vf = parseFloat(document.getElementById('vf').value);
+            document.getElementById('vfVal').textContent = 'VF = ' + vf.toFixed(2);
+            const elecQtrMm = lambdaMm / 4;
+            const skirtMm = elecQtrMm * vf;
+            document.getElementById('elecQtr').textContent = elecQtrMm.toFixed(1) + ' mm';
+            document.getElementById('skirtLen').textContent = skirtMm.toFixed(1) + ' mm';
+
+            // Table
+            document.getElementById('tFreq').textContent = fGHz.toFixed(2) + ' GHz';
+            document.getElementById('tLambda').textContent = lambdaMm.toFixed(1) + ' mm';
+            document.getElementById('tStub').textContent = stubLenMm.toFixed(1) + ' mm';
+            document.getElementById('tSkirt').textContent = skirtMm.toFixed(1) + ' mm';
+        }
+
+        ['freq', 'stubFrac', 'vf'].forEach(id => {
+            document.getElementById(id).addEventListener('input', update);
+        });
+        update();
+    </script>
+</body>
+</html>
